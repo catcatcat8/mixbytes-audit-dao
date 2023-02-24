@@ -170,7 +170,7 @@ Consider implementing `Stoppable.sol` contract by taking `AccessControl.sol` and
 Imports at 
 * https://github.com/litrafi/litra-contract/blob/main/contracts/tokenize/WrappedNFT.sol#L4,
 * https://github.com/litrafi/litra-contract/blob/main/contracts/utils/NftReceiver.sol/#L4,
-* https://github.com/litrafi/litra-contract/blob/main/contracts/dao/admin/Stoppable.sol#L4,
+* https://github.com/litrafi/litra-contract/blob/main/contracts/dao/admin/Stoppable.sol#L4
 are never used.
 
 ##### Recommendation
