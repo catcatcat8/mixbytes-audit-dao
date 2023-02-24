@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol"; // @audit low: useless safemath for pragma 0.8.0
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol"; //  @audit low: outdated contract, use ERC20Permit.sol
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
 contract WrappedNFT is ERC20Permit {
     address public creator;

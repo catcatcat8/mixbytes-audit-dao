@@ -46,7 +46,7 @@ contract LA is ERC20 {
         if(rate == 0) {
             _rate = INITIAL_RATE;
         } else {
-            _startEpochSupply += _rate * RATE_REDUCTION_TIME; // @audit почему растет???
+            _startEpochSupply += _rate * RATE_REDUCTION_TIME;
             _rate = _rate * RATE_DENOMINATOR / RATE_REDUCTION_COEFFICIENT;
         }
 
@@ -135,20 +135,20 @@ contract LA is ERC20 {
         return toMint;
     }
 
-    function setMinter(address _minter) external { // tok 1 raz esli ne 0
+    function setMinter(address _minter) external {
         require(_msgSender() == admin, "!admin");
         require(minter == address(0), "Already set");
         minter = _minter;
         emit SetMinter(_minter);
     }
 
-    function setAmind(address _admin) external { // skok ygodno raz @audit low: Amind - опечатка
+    function setAmind(address _admin) external {
         require(_msgSender() == admin, "!admin");
         admin = _admin;
         emit SetAdmin(_admin);
     }
 
-    function mint(address _to, uint256 _value) external { // mintit скок хочет
+    function mint(address _to, uint256 _value) external { // @audit mintit скок хочет
         require(_msgSender() == minter, "!minter");
         require(_to != address(0), "Zero address");
 

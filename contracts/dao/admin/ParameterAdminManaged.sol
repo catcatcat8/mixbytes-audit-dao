@@ -2,7 +2,7 @@ pragma solidity ^0.8.0;
 
 import "./OwnershipAdminManaged.sol";
 
-abstract contract ParameterAdminManaged is OwnershipAdminManaged { // @audit USELESS CONTRACT - NEVER USED
+abstract contract ParameterAdminManaged is OwnershipAdminManaged {
     address public parameterAdmin;
     address public futureParameterAdmin;
 

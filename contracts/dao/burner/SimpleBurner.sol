@@ -27,7 +27,7 @@ contract SimpleBurner is Stoppable, IBurner { // @note why not to use pausable +
         uint256 inAmount = IERC20(_wnft).balanceOf(msg.sender);
         IERC20(_wnft).transferFrom(msg.sender, address(this), inAmount);
         // find pool
-        address poolAddr = IPoolFactory(poolFactory).find_pool_for_coins(_wnft, weth); // @audit check what happens if returns 0 if addr doesn't exist
+        address poolAddr = IPoolFactory(poolFactory).find_pool_for_coins(_wnft, weth);
         ICurvePool pool = ICurvePool(poolAddr);
         uint256 i;
         uint256 j;
@@ -41,6 +41,6 @@ contract SimpleBurner is Stoppable, IBurner { // @note why not to use pausable +
         }
         // swap for eth
         IERC20(_wnft).approve(poolAddr, inAmount);
-        pool.exchange(i, j, inAmount, 0, true, receiver);
+        pool.exchange(i, j, inAmount, 0, true, payable(msg.sender));
     }
 }

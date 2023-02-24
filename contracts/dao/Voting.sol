@@ -18,7 +18,7 @@ contract Voting is IForwarder, AragonApp {
 
     uint128 private constant MAX_UINT_128 = 2 ** 128 - 1;
     uint128 private constant MAX_UINT_64 = 2 ** 64 - 1;
-    // @audit why not use keccak?? unreadable
+
     bytes32 public constant CREATE_VOTES_ROLE = 0xe7dcd7275292e064d090fbc5f3bd7995be23b502c1fed5cd94cfddbbdcd32bbc; //keccak256("CREATE_VOTES_ROLE");
     bytes32 public constant MODIFY_SUPPORT_ROLE = 0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650; //keccak256("MODIFY_SUPPORT_ROLE");
     bytes32 public constant MODIFY_QUORUM_ROLE = 0xad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39; //keccak256("MODIFY_QUORUM_ROLE");
@@ -154,7 +154,7 @@ contract Voting is IForwarder, AragonApp {
 
         uint256 decimalsMul = uint256(10) ** token.decimals(); // dopystim 10**18
 
-        minBalance = _minBalance.mul(decimalsMul); // @audit overflow is possible?? (not really)
+        minBalance = _minBalance.mul(decimalsMul);
         minTime = _minTime;
 
         minBalanceLowerLimit = _minBalanceLowerLimit.mul(decimalsMul);
@@ -319,7 +319,7 @@ contract Voting is IForwarder, AragonApp {
     * @dev IForwarder interface conformance
     * @return Always true
     */
-    function isForwarder() external pure returns (bool) { // @audit wtf??
+    function isForwarder() external pure returns (bool) {
         return true;
     }
 
@@ -367,7 +367,7 @@ contract Voting is IForwarder, AragonApp {
     }
 
     function canCreateNewVote(address _sender) public view returns(bool) {
-        return enableVoteCreation && token.balanceOf(_sender) >= minBalance &&  block.timestamp.sub(minTime) >= lastCreateVoteTimes[_sender]; // @audit high balanceOf - balanceOfAt???
+        return enableVoteCreation && token.balanceOf(_sender) >= minBalance && block.timestamp.sub(minTime) >= lastCreateVoteTimes[_sender];
     }
 
     /**
@@ -441,23 +441,23 @@ contract Voting is IForwarder, AragonApp {
         Vote storage vote_ = votes[voteId];
         vote_.startDate = getTimestamp64();
         vote_.snapshotBlock = snapshotBlock;
-        vote_.supportRequiredPct = supportRequiredPct; // @audit writes to storage, but if admin change??
+        vote_.supportRequiredPct = supportRequiredPct;
         vote_.minAcceptQuorumPct = minAcceptQuorumPct;
         vote_.votingPower = votingPower;
         vote_.executionScript = _executionScript;
-        emit StartVote(voteId, msg.sender, _metadata, minBalance, minTime, token.totalSupply(), token.balanceOfAt(msg.sender, snapshotBlock)); // // @audit totalSupplyAt()
+        emit StartVote(voteId, msg.sender, _metadata, minBalance, minTime, token.totalSupply(), token.balanceOfAt(msg.sender, snapshotBlock));
 
         lastCreateVoteTimes[msg.sender] = getTimestamp64();
 
-        if (_castVote && _canVote(voteId, msg.sender)) { // @audit useless check canVote vote cant be finished (if time != 0) and executed, balance in canCreateNewVote should be changed to snapshot block (check min != 0)
-            _vote(voteId, PCT_BASE, 0, msg.sender, _executesIfDecided); // @audit if _castVote false executesIfDecided doesnt matter
+        if (_castVote && _canVote(voteId, msg.sender)) {
+            _vote(voteId, PCT_BASE, 0, msg.sender, _executesIfDecided);
         }
     }
 
     /**
     * @dev Internal function to cast a vote. It assumes the queried vote exists.
     */
-    function _vote(uint256 _voteId, uint256 _yeaPct, uint256 _nayPct, address _voter, bool _executesIfDecided) internal { // @audit можно ли поставить yea + nay != 100?
+    function _vote(uint256 _voteId, uint256 _yeaPct, uint256 _nayPct, address _voter, bool _executesIfDecided) internal {
         Vote storage vote_ = votes[_voteId];
 
         VoterState state = vote_.voters[_voter];
@@ -473,7 +473,7 @@ contract Voting is IForwarder, AragonApp {
         uint256 nay = voterStake.mul(_nayPct).div(PCT_BASE);
 
         if (yea > 0) {
-            vote_.yea = vote_.yea.add(yea); // @audit почему просто не vote_.yea.add(yea) ??
+            vote_.yea = vote_.yea.add(yea);
         }
         if (nay > 0) {
             vote_.nay = vote_.nay.add(nay);
@@ -481,7 +481,7 @@ contract Voting is IForwarder, AragonApp {
 
         vote_.voters[_voter] = yea == nay ? VoterState.Even : yea > nay ? VoterState.Yea : VoterState.Nay;
 
-        if (yea > 0) { // @audit dublicate with 475??? zachem, почему не вставить ивенты туда?
+        if (yea > 0) {
           emit CastVote(_voteId, _voter, true, yea);
         }
         if (nay > 0) {
@@ -537,7 +537,7 @@ contract Voting is IForwarder, AragonApp {
         }
 
         // Vote ended?
-        if (_isVoteOpen(vote_)) { // @audit low; dupllicate code 526
+        if (_isVoteOpen(vote_)) {
             return false;
         }
         // Has enough support?
@@ -546,7 +546,7 @@ contract Voting is IForwarder, AragonApp {
             return false;
         }
         // Has min quorum?
-        if (!_isValuePct(vote_.yea, vote_.votingPower, vote_.minAcceptQuorumPct)) { // @audit кворум разве не по всем голосам?? тут только по да
+        if (!_isValuePct(vote_.yea, vote_.votingPower, vote_.minAcceptQuorumPct)) {
             return false;
         }
 
@@ -567,7 +567,7 @@ contract Voting is IForwarder, AragonApp {
     * @return True if the given vote is open, false otherwise
     */
     function _isVoteOpen(Vote storage vote_) internal view returns (bool) {
-        return getTimestamp64() < vote_.startDate.add(voteTime) && !vote_.executed; // @audit check order of operators
+        return getTimestamp64() < vote_.startDate.add(voteTime) && !vote_.executed;
     }
 
     /**
