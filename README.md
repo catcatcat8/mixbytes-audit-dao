@@ -56,8 +56,9 @@ pool.exchange(i, j, inAmount, 0, true, payable(msg.sender));
 #### 1. Lack of checks in initialize function
 
 ##### Description
-If the `voteTime` variable is set to `0` at line https://github.com/litrafi/litra-contract/blob/main/contracts/dao/Voting.sol#L153, then no one will be able to vote cause of division by zero at line https://github.com/litrafi/litra-contract/blob/main/contracts/dao/Voting.sol#L467. In this case, the contract will need to be redeployed as there is no ability to change this variable. 
-If the `_token` variable is set to zero address the contract will also need to be redeployed.
+If the `voteTime` variable is set to `0` at line https://github.com/litrafi/litra-contract/blob/main/contracts/dao/Voting.sol#L153, then no one will be able to vote cause of division by zero at line https://github.com/litrafi/litra-contract/blob/main/contracts/dao/Voting.sol#L467. In this case, the contract will need to be redeployed as there is no ability to change this variable.
+
+If the `_token` variable is set to zero address at line https://github.com/litrafi/litra-contract/blob/main/contracts/dao/Voting.sol#L150 the contract will also need to be redeployed.
 
 ##### Recommendation
 It is recommended to add an additional checks in `initialize()` function:
